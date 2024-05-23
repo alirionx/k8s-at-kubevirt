@@ -1,0 +1,84 @@
+apiVersion: pool.kubevirt.io/v1alpha1
+kind: VirtualMachinePool
+metadata:
+  name: ${node_type}-${cluster_name}
+  namespace: ${cluster_namespace}
+spec:
+  replicas: ${pool_size}
+  selector:
+    matchLabels:
+      kubevirt.io/vmpool: ${node_type}-${cluster_name}
+  virtualMachineTemplate:
+    metadata:
+      labels:
+        kubevirt.io/vmpool: ${node_type}-${cluster_name}
+    spec:
+      dataVolumeTemplates:
+      - metadata:
+          name: ${node_type}-osvol
+        spec:
+          pvc:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: ${node_disk_size}Gi
+            storageClassName: local-path
+          source:
+            ${cluster_node_os_image_type}:
+              url: ${cluster_node_os_image_url}
+              
+      running: true
+      template:
+        metadata:
+          labels:
+            kubevirt.io/vmpool: ${node_type}-${cluster_name}
+        spec:
+          domain:
+            devices:
+              disks:
+              - name: ${node_type}-osvol
+                disk:
+                  bus: virtio
+              - name: cloudinitdisk
+                disk:
+                  bus: virtio
+              interfaces:
+              - name: default
+                bridge: {}
+                # masquerade: {}
+                # macAddress: '02:26:21:00:00:01'
+                model: virtio
+            cpu:
+              sockets: ${vm_sockets}
+              cores: ${vm_cores}
+              threads: 1
+            resources:
+              requests:
+                memory: ${vm_memory}Mi
+          networks:
+          - name: default
+            pod: {}
+          volumes:
+          - name: ${node_type}-osvol
+            dataVolume:
+              name: ${node_type}-osvol
+          - name: cloudinitdisk
+            cloudInitNoCloud:
+              userData: |
+                #cloud-config
+                package_update: true
+                package_upgrade: true
+                packages: []
+                users:
+                - chpasswd: '{ expire: False }'
+                  groups:
+                  - sudo
+                  - adm
+                  lock_passwd: false
+                  name: ubuntu
+                  passwd: $2b$14$j1rCDirB2L.pSmL1ahPWKO/wJ4TnDMRPe0o/DwHFtomFsmAHdh54W
+                  shell: /bin/bash
+                  ssh_authorized_keys: ${cluster_vm_ssh_authorized_key}
+                  ssh_pwauth: true
+                  sudo: ALL=(ALL) NOPASSWD:ALL

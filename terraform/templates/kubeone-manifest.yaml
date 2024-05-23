@@ -1,0 +1,37 @@
+# install kubeone cli and templates => ( curl -sfL https://get.kubeone.io | sh )
+# deploy cluster => ( kubeone apply -m kubeone-manifest-${cluster_name}.yaml )
+
+apiVersion: kubeone.k8c.io/v1beta2
+kind: KubeOneCluster
+name: ${cluster_name}
+versions:
+  kubernetes: '1.28.9'
+cloudProvider:
+  none: {}
+
+controlPlane:
+  hosts:
+%{ for idx, ip in masters_public_ips ~}
+    - publicAddress: '${masters_public_ips[idx]}'
+      privateAddress: '${masters_private_ips[idx]}'
+      sshUsername: ubuntu
+      sshPrivateKeyFile: '/home/alirionx/.ssh/id_rsa'
+%{ endfor ~}
+
+staticWorkers:
+  hosts:
+%{ for idx, ip in workers_public_ips ~}
+    - publicAddress: '${workers_public_ips[idx]}'
+      privateAddress: '${workers_private_ips[idx]}'
+      sshUsername: ubuntu
+      sshPrivateKeyFile: '/home/alirionx/.ssh/id_rsa'
+%{ endfor ~}
+
+# Provide the external address of your load balancer or the public addresses of
+# the first control plane nodes.
+apiEndpoint:
+  host: '${masters_public_ips[0]}'
+  port: 6443
+
+machineController:
+  deploy: false

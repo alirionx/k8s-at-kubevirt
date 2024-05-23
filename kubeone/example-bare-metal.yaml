@@ -1,0 +1,49 @@
+# install kubeone cli and templates => ( curl -sfL https://get.kubeone.io | sh )
+# deploy cluster => ( kubeone apply -m bare-metal-cluster.yaml )
+
+apiVersion: kubeone.k8c.io/v1beta2
+kind: KubeOneCluster
+name: example-bare-metal
+versions:
+  kubernetes: '1.28.9'
+cloudProvider:
+  none: {}
+
+controlPlane:
+  hosts:
+    - publicAddress: '192.168.10.11'
+      privateAddress: '10.42.0.11'
+      sshUsername: ubuntu
+      sshPrivateKeyFile: '/home/ubuntu/.ssh/id_rsa'
+    - publicAddress: '192.168.10.12'
+      privateAddress: '10.42.0.12'
+      sshUsername: ubuntu
+      sshPrivateKeyFile: '/home/ubuntu/.ssh/id_rsa'
+    - publicAddress: '192.168.10.13'
+      privateAddress: '10.42.0.13'
+      sshUsername: ubuntu
+      sshPrivateKeyFile: '/home/ubuntu/.ssh/id_rsa'
+
+staticWorkers:
+  hosts:
+    - publicAddress: '192.168.10.21'
+      privateAddress: '10.42.0.21'
+      sshUsername: ubuntu
+      sshPrivateKeyFile: '/home/ubuntu/.ssh/id_rsa'
+    - publicAddress: '192.168.10.22'
+      privateAddress: '10.42.0.22'
+      sshUsername: ubuntu
+      sshPrivateKeyFile: '/home/ubuntu/.ssh/id_rsa'
+    - publicAddress: '192.168.10.23'
+      privateAddress: '10.42.0.23'
+      sshUsername: ubuntu
+      sshPrivateKeyFile: '/home/ubuntu/.ssh/id_rsa'
+
+# Provide the external address of your load balancer or the public addresses of
+# the first control plane nodes.
+apiEndpoint:
+  host: '192.168.10.11'
+  port: 6443
+
+machineController:
+  deploy: false
