@@ -60,24 +60,25 @@ data "template_file" "workers_machine_pool" {
 }
 
 resource "kubernetes_manifest" "workers_machine_pool" {
-    manifest =  yamldecode("${data.template_file.workers_machine_pool.rendered}")
-    computed_fields = [
-      "metadata.annotations",
-      "metadata.labels",
-      "spec.virtualMachineTemplate.metadata.creationTimestamp",
-      "spec.virtualMachineTemplate.spec.dataVolumeTemplates[0].creationTimestamp",
-      "spec.virtualMachineTemplate.spec.template.metadata.creationTimestamp",
-    ]
-    wait {
-      fields = {
-        "status.readyReplicas" = var.worker_pool_size
-      }
+  count = var.worker_pool_size
+  manifest =  yamldecode("${data.template_file.workers_machine_pool.rendered}")
+  computed_fields = [
+    "metadata.annotations",
+    "metadata.labels",
+    "spec.virtualMachineTemplate.metadata.creationTimestamp",
+    "spec.virtualMachineTemplate.spec.dataVolumeTemplates[0].creationTimestamp",
+    "spec.virtualMachineTemplate.spec.template.metadata.creationTimestamp",
+  ]
+  wait {
+    fields = {
+      "status.readyReplicas" = var.worker_pool_size
     }
-    timeouts {
-      create = "10m"
-      update = "10m"
-      delete = "1m"
-    }
+  }
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "1m"
+  }
 }
 
 

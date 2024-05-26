@@ -3,3 +3,4 @@ terraform/.terraform/
 *.backup
 *.hcl
 *.img
+*.env

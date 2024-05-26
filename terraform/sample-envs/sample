@@ -1,0 +1,13 @@
+export TF_VAR_kube_config_path="~/.kube/config"
+export TF_VAR_cluster_vm_ssh_authorized_key="ssh-rsa AAA..."
+export TF_VAR_cluster_name="sample-cluster"
+export TF_VAR_master_pool_size=3
+export TF_VAR_master_node_disk_size=24
+export TF_VAR_master_vm_sockets=2
+export TF_VAR_master_vm_cores=2
+export TF_VAR_master_vm_memory=2048
+export TF_VAR_worker_pool_size=3
+export TF_VAR_master_node_disk_size=32
+export TF_VAR_master_vm_sockets=2
+export TF_VAR_master_vm_cores=2
+export TF_VAR_master_vm_memory=4096
